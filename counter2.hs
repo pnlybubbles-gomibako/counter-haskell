@@ -1,4 +1,4 @@
--- MyState
+-- State
 newtype MyState s a = MyState {
   run :: s -> (a, s)
 }
@@ -9,6 +9,7 @@ class MyMonad m where
   bind_ :: m a -> m b -> m b
   unit :: a -> m a
 
+-- Stateモナド
 instance MyMonad (MyState s) where
   method `bind` lambda = MyState $ \state ->
     let
