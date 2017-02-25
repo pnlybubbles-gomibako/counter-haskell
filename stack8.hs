@@ -8,10 +8,10 @@ type StackOp a b = State (Stack a) b
 -- Stackの先頭に要素を追加
 -- (追加する要素) -> (初期Stack) -> (先端の要素, 更新されたStack)
 push :: a -> StackOp a a
-push c = do
-  (Stack cs) <- get
-  put (Stack (c:cs))
-  return c
+push c =
+  get
+  >>= \(Stack cs) -> put (Stack (c:cs))
+  >> return c
 
 -- Stackの専用の要素を取り出す
 -- (初期Stack) -> (取り出された要素, 更新されたStack)
