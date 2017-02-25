@@ -16,58 +16,64 @@ push c = do
 -- Stackの専用の要素を取り出す
 -- (初期Stack) -> (取り出された要素, 更新されたStack)
 pop :: StackOp a a
-pop =
-  get
-  >>= \(Stack (c:cs)) -> put (Stack cs)
-  >> return c
+pop = do
+  (Stack (c:cs)) <- get
+  put (Stack cs)
+  return c
 
 -- popした要素を調べる
 headIs :: (a -> Bool) -> StackOp a Bool
-headIs checker =
-  pop
-  >>= \i -> return (checker i)
+headIs checker = do
+  i <- pop
+  return (checker i)
 
 -- 空にする
 empty :: StackOp a ()
-empty =
+empty = do
   put (Stack [])
-  >> return ()
+  return ()
 
 main = do
   let stack = Stack [1, 2, 3, 4, 5]
   print
     $ (`runState` stack)
-    $ headIs (> 4)
-      >>= \i1 -> headIs (> 3)
-      >>= \i2 -> headIs (> 2)
-      >>= \i3 -> return (and [i1, i2, i3])
+    $ do
+      i1 <- headIs (> 4)
+      i2 <- headIs (> 3)
+      i3 <- headIs (> 2)
+      return (and [i1, i2, i3])
   print
     $ (`runState` stack)
-    $ pop
-      >>= \i1 -> pop
-      >>= \i2 -> return (i1 + i2)
+    $ do
+      i1 <- pop
+      i2 <- pop
+      return (i1 + i2)
   print
     $ (`runState` stack)
-    $ push 10
-      >> push 12
-      >> pop
-      >>= \i -> return i
+    $ do
+      push 10
+      push 12
+      i <- pop
+      return i
   print
     $ (`runState` stack)
-    $ pop
-      >>= \i -> push 10
-      >> push 12
-      >> return i
+    $ do
+      i <- pop
+      push 10
+      push 12
+      return i
   print
     $ (`runState` stack)
-    $ pop
-      >>= \i1 -> pop
-      >>= \i2 -> push 10
-      >> push 12
-      >> return (i1 + i2)
+    $ do
+      i1 <- pop
+      i2 <- pop
+      push 10
+      push 12
+      return (i1 + i2)
   print
     $ (`runState` stack)
-    $ push 10
-      >> empty
-      >> push 11
-      >> push 12
+    $ do
+      push 10
+      empty
+      push 11
+      push 12
